@@ -1,10 +1,12 @@
 ﻿// Michael R. Hansen 05-01-2016
 
+System.IO.Directory.SetCurrentDirectory __SOURCE_DIRECTORY__;;
+
 // You must revise 4 pathes occurring in this file 
 // The first three are:
-#r @"C:\Users\mire\Documents\MRH data\Kurser\02257-16\GuardedCommandsVersion2\GuardedCommands\GuardedCommands\bin\Debug\FSharp.PowerPack.dll";;
-#r @"C:\Users\mire\Documents\MRH data\Kurser\02257-16\GuardedCommandsVersion2\GuardedCommands\GuardedCommands\bin\Debug\Machine.dll";
-#r @"C:\Users\mire\Documents\MRH data\Kurser\02257-16\GuardedCommandsVersion2\GuardedCommands\GuardedCommands\bin\Debug\\VirtualMachine.dll";
+#r @"bin\Debug\FSharp.PowerPack.dll";;
+#r @"bin\Debug\Machine.dll";
+#r @"bin\Debug\VirtualMachine.dll";
 
 #load "AST.fs"
 #load "Parser.fs"
@@ -27,7 +29,7 @@ open Machine
 open VirtualMachine
 
 // You must revise this path
-System.IO.Directory.SetCurrentDirectory @"C:\Users\mire\Documents\MRH data\Kurser\02257-16\GuardedCommandsVersion2\GuardedCommands\GuardedCommands";;
+// System.IO.Directory.SetCurrentDirectory @"C:\Users\mire\Documents\MRH data\Kurser\02257-16\GuardedCommandsVersion2\GuardedCommands\GuardedCommands";;
 
 // The Ex0.gc example:
 
@@ -72,7 +74,7 @@ List.iter execOpt ["Ex1.gc"; "Ex2.gc"];;
 let pts = List.map parseFromFile ["Ex1.gc"; "Ex2.gc";"Ex3.gc"; "Ex4.gc"; "Ex5.gc"; "Ex6.gc"; "Skip.gc"];;
 
 // The parse tree for Ex3.gc
-List.nth pts 2;
+List.item pts 2;
 
 (*
 // Test of programs covered by the first task (Section 3.7):
