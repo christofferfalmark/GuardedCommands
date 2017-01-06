@@ -74,12 +74,16 @@ List.iter execOpt ["Ex1.gc"; "Ex2.gc"];;
 let pts = List.map parseFromFile ["Ex1.gc"; "Ex2.gc";"Ex3.gc"; "Ex4.gc"; "Ex5.gc"; "Ex6.gc"; "Skip.gc"];;
 
 // The parse tree for Ex3.gc
-List.item pts 2;
+List.item 2 pts;
 
-(*
 // Test of programs covered by the first task (Section 3.7):
-List.iter exec ["Ex1.gc"; "Ex2.gc";"Ex3.gc"; "Ex4.gc"; "Ex5.gc"; "Ex6.gc"; "Skip.gc"];;
+//List.iter exec ["Ex1.gc"; "Ex2.gc";"Ex3.gc"; "Ex4.gc"; "Ex5.gc"; "Ex6.gc"; "Skip.gc"];;
 
+// Test GC:
+///let _ = tcP (parseFromFile "Ex3.gc")
+
+go (parseFromFile "Ex3.gc")
+(*
 // Test of programs covered by the second task (Section 4.3):
 List.iter exec ["Ex7.gc"; "fact.gc"; "factRec.gc"; "factCBV.gc"];;
 

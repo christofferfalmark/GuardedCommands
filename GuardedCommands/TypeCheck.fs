@@ -57,8 +57,8 @@ module TypeCheck =
                          | Ass(acc,e) -> if tcA gtenv ltenv acc = tcE gtenv ltenv e 
                                          then ()
                                          else failwith "illtyped assignment"                                
-
                          | Block([],stms) -> List.iter (tcS gtenv ltenv) stms
+                         | Alt (GC(gcs)) | Do (GC(gcs)) -> tcGCSeq gtenv ltenv gcs
                          | _              -> failwith "tcS: this statement is not supported yet"
 
    and tcGDec gtenv = function  
@@ -68,7 +68,11 @@ module TypeCheck =
    and tcGDecs gtenv = function
                        | dec::decs -> tcGDecs (tcGDec gtenv dec) decs
                        | _         -> gtenv
-
+   and tcGCSeq gtenv ltenv = function
+                       | (((exp:Exp), (stms:Stm list))::gc) -> List.iter (tcS gtenv ltenv) stms 
+                                                               if tcE gtenv ltenv exp = BTyp  then () else failwith "guardedCommand must contain a boolean expression"
+                                                               tcGCSeq gtenv ltenv gc                       
+                       | [] -> ()
 
 /// tcP prog checks the well-typeness of a program prog
    and tcP(P(decs, stms)) = let gtenv = tcGDecs Map.empty decs

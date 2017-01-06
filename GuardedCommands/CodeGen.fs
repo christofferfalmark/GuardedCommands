@@ -29,9 +29,7 @@ module CodeGeneration =
        | N n          -> [CSTI n]
        | B b          -> [CSTI (if b then 1 else 0)]
        | Access acc   -> CA vEnv fEnv acc @ [LDI] 
-
        | Apply("-", [e]) -> CE vEnv fEnv e @  [CSTI 0; SWAP; SUB]
-
        | Apply("&&",[b1;b2]) -> let labend   = newLabel()
                                 let labfalse = newLabel()
                                 CE vEnv fEnv b1 @ [IFZERO labfalse] @ CE vEnv fEnv b2
@@ -44,7 +42,6 @@ module CodeGeneration =
                                           | "="  -> [EQ] 
                                           | _    -> failwith "CE: this case is not possible"
                                 CE vEnv fEnv e1 @ CE vEnv fEnv e2 @ ins 
-
        | _            -> failwith "CE: not supported yet"
        
 
@@ -67,7 +64,6 @@ module CodeGeneration =
       let newEnv = (Map.add x (kind fdepth, typ) env, fdepth+1)
       let code = [INCSP 1]
       (newEnv, code)
-
                       
 /// CS vEnv fEnv s gives the code for a statement s on the basis of a variable and a function environment                          
    let rec CS vEnv fEnv = function
@@ -75,11 +71,16 @@ module CodeGeneration =
 
        | Ass(acc,e)       -> CA vEnv fEnv acc @ CE vEnv fEnv e @ [STI; INCSP -1]
 
-       | Block([],stms) ->   CSs vEnv fEnv stms
+       | Block([],stms)  ->   CSs vEnv fEnv stms
 
-       | _                -> failwith "CS: this statement is not supported yet"
+       | Alt (GC(gcs))   ->   CSGCSeq vEnv fEnv gcs
+       | Do (GC(gcs))         -> failwith "CS: Do statement is not supported yet"
+       | _ -> failwith "hej"
 
    and CSs vEnv fEnv stms = List.collect (CS vEnv fEnv) stms 
+   and CSGCSeq vEnv fEnv = function 
+     | (((exp:Exp), (stms:Stm list))::gc) -> CE vEnv fEnv exp @ CSs vEnv fEnv stms @ CSGCSeq vEnv fEnv gc
+     | _ -> []
 
 
 
