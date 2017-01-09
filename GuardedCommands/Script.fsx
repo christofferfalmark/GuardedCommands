@@ -82,7 +82,9 @@ List.item 2 pts;
 // Test GC:
 ///let _ = tcP (parseFromFile "Ex3.gc")
 
-go (parseFromFile "Ex3.gc")
+parseFromFile "Ex3.gc"
+CP (parseFromFile "Ex6.gc")
+exec "Ex3.gc"
 (*
 // Test of programs covered by the second task (Section 4.3):
 List.iter exec ["Ex7.gc"; "fact.gc"; "factRec.gc"; "factCBV.gc"];;
@@ -100,3 +102,4 @@ List.iter exec ["par1.gc"; "factImpPTyp.gc"; "QuickSortV2.gc"; "par2.gc"];;
 List.iter execOpt ["par1.gc"; "factImpPTyp.gc"; "QuickSortV2.gc"; "par2.gc"];;
 
 *)
+

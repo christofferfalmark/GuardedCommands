@@ -66,6 +66,7 @@ module CodeGeneration =
       (newEnv, code)
                       
 /// CS vEnv fEnv s gives the code for a statement s on the basis of a variable and a function environment                          
+   let labend   = newLabel()
    let rec CS vEnv fEnv = function
        | PrintLn e        -> CE vEnv fEnv e @ [PRINTI; INCSP -1] 
 
@@ -78,12 +79,17 @@ module CodeGeneration =
        | _ -> failwith "hej"
 
    and CSs vEnv fEnv stms = List.collect (CS vEnv fEnv) stms 
+
+
    and CSGCSeq vEnv fEnv = function 
-     | (((exp:Exp), (stms:Stm list))::gc) -> CE vEnv fEnv exp @ CSs vEnv fEnv stms @ CSGCSeq vEnv fEnv gc
-     | _ -> []
+     | (((exp:Exp), (stms:Stm list))::gc) -> let labfalse = newLabel()
+                                             CE vEnv fEnv exp @ [IFZERO labfalse] @ CSs vEnv fEnv stms @ [GOTO labend; Label labfalse] @ CSGCSeq vEnv fEnv gc
+     | _ -> [STOP; Label labend]
 
-
-
+        (*
+                                CE vEnv fEnv b1 @ [IFZERO labfalse] @ CE vEnv fEnv b2
+                                @ [GOTO labend; Label labfalse; CSTI 0; Label labend]
+        *)
 (* ------------------------------------------------------------------- *)
 
 (* Build environments for global variables and functions *)
