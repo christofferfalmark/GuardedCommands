@@ -30,16 +30,18 @@ module CodeGeneration =
        | B b          -> [CSTI (if b then 1 else 0)]
        | Access acc   -> CA vEnv fEnv acc @ [LDI] 
        | Apply("-", [e]) -> CE vEnv fEnv e @  [CSTI 0; SWAP; SUB]
+       | Apply("!", [e]) -> CE vEnv fEnv e @ [NOT]
        | Apply("&&",[b1;b2]) -> let labend   = newLabel()
                                 let labfalse = newLabel()
                                 CE vEnv fEnv b1 @ [IFZERO labfalse] @ CE vEnv fEnv b2
                                 @ [GOTO labend; Label labfalse; CSTI 0; Label labend]
 
-       | Apply(o,[e1;e2]) when List.exists (fun x -> o=x) ["+"; "*"; "="]
+       | Apply(o,[e1;e2]) when List.exists (fun x -> o=x) ["+"; "*"; "="; "-"]
                              -> let ins = match o with
                                           | "+"  -> [ADD]
                                           | "*"  -> [MUL]
                                           | "="  -> [EQ] 
+                                          | "-"  -> [SUB] 
                                           | _    -> failwith "CE: this case is not possible"
                                 CE vEnv fEnv e1 @ CE vEnv fEnv e2 @ ins 
        | _            -> failwith "CE: not supported yet"
@@ -67,23 +69,31 @@ module CodeGeneration =
                       
 /// CS vEnv fEnv s gives the code for a statement s on the basis of a variable and a function environment                          
    let labend   = newLabel()
+   let labbegin = newLabel()
    let rec CS vEnv fEnv = function
        | PrintLn e        -> CE vEnv fEnv e @ [PRINTI; INCSP -1] 
 
        | Ass(acc,e)       -> CA vEnv fEnv acc @ CE vEnv fEnv e @ [STI; INCSP -1]
 
-       | Block([],stms)  ->   CSs vEnv fEnv stms
+       | Block([],stms)  -> CSs vEnv fEnv stms
 
-       | Alt (GC(gcs))   ->   CSGCSeq vEnv fEnv gcs
-       | Do (GC(gcs))         -> failwith "CS: Do statement is not supported yet"
+       | Alt (GC(gcs))   -> CSGCAlt vEnv fEnv gcs
+
+       | Do (GC(gcs))    -> [Label labbegin] @
+                            CSGCDo vEnv fEnv gcs
        | _ -> failwith "hej"
 
    and CSs vEnv fEnv stms = List.collect (CS vEnv fEnv) stms 
 
 
-   and CSGCSeq vEnv fEnv = function 
+   and CSGCDo vEnv fEnv = function 
      | (((exp:Exp), (stms:Stm list))::gc) -> let labfalse = newLabel()
-                                             CE vEnv fEnv exp @ [IFZERO labfalse] @ CSs vEnv fEnv stms @ [GOTO labend; Label labfalse] @ CSGCSeq vEnv fEnv gc
+                                             CE vEnv fEnv exp @ [IFZERO labfalse] @ CSs vEnv fEnv stms @ [GOTO labbegin; Label labfalse] @ CSGCDo vEnv fEnv gc
+     | _ -> []
+
+   and CSGCAlt vEnv fEnv = function 
+     | (((exp:Exp), (stms:Stm list))::gc) -> let labfalse = newLabel()
+                                             CE vEnv fEnv exp @ [IFZERO labfalse] @ CSs vEnv fEnv stms @ [GOTO labend; Label labfalse] @ CSGCAlt vEnv fEnv gc
      | _ -> [STOP; Label labend]
 
         (*
