@@ -94,6 +94,8 @@ exec "Ex5.gc"
 parseFromFile "Ex7.gc"
 // List.iter exec ["Ex7.gc"; "fact.gc"; "factRec.gc"; "factCBV.gc"];;
 exec "Ex7.gc"
+// Test of programs where the type-checker detects error(s) 
+// Ex7_Error.gc
 
 (*
 // Test of programs covered by the fourth task (Section 5.4):
