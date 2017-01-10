@@ -16,15 +16,11 @@ module TypeCheck =
          | Apply(f,[e])     when List.exists (fun x ->  x=f) ["-";"!"]                 -> tcMonadic gtenv ltenv f e
          | Apply(f,[e1;e2]) when List.exists (fun x ->  x=f) ["+";"*"; "="; "&&"; "-"] -> tcDyadic gtenv ltenv f e1 e2   
          | Apply(f, exprs)  -> match  (Map.tryFind f gtenv) with 
-                                | Some(FTyp(a,b))  -> failwith "function application not supported yet" 
-                                // for i in 0..exprs.Length-1 do if (a.Item i) = (tcE gtenv ltenv (exprs.Item i)) then BTyp else failwith ""
-                                (*
-                                                      if List.forall(fun x -> List.exists (fun y -> y = (tcE gtenv ltenv x)) a) exprs
-                                                      then ITyp 
-                                                      else failwith "function application error"
-                                *)
-                                | Some(_) | None   -> failwith "d'oh!"
+                                | Some(FTyp(a,b:Typ option))  -> if tcFApp gtenv ltenv exprs a then b.Value else 
+                                                                 failwith "illtyped function application"
+                                | Some(_) | None              -> failwith "illtyped function application"
          | _                                                                           -> failwith "tcE: not supported yet"
+   and tcFApp gtenv ltenv exprs a = List.forall2(fun exp a' -> tcE gtenv ltenv exp = a') exprs a
 
    and tcMonadic gtenv ltenv f e = match (f, tcE gtenv ltenv e) with
                                    | ("-", ITyp) -> ITyp
