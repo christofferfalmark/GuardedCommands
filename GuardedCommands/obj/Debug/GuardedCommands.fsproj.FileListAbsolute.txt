@@ -39,3 +39,12 @@ D:\Document\GitHub\GuardedCommands\GuardedCommands\bin\Debug\FSharp.Core.xml
 D:\Document\GitHub\GuardedCommands\GuardedCommands\bin\Debug\FsLexYacc.Runtime.xml
 D:\Document\GitHub\GuardedCommands\GuardedCommands\obj\Debug\GuardedCommands.dll
 D:\Document\GitHub\GuardedCommands\GuardedCommands\obj\Debug\GuardedCommands.pdb
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\bin\Debug\GuardedCommands.XML
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\obj\Debug\GuardedCommands.dll
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\obj\Debug\GuardedCommands.pdb
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\bin\Debug\GuardedCommands.dll
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\bin\Debug\GuardedCommands.pdb
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\bin\Debug\FSharp.Core.dll
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\bin\Debug\FsLexYacc.Runtime.dll
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\bin\Debug\FSharp.Core.xml
+C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\bin\Debug\FsLexYacc.Runtime.xml

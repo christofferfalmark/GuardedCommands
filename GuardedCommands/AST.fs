@@ -35,8 +35,7 @@ module AST =
 
    and Dec = 
          | VarDec of Typ * string        (* Variable declaration               *)
-         | FunDec of Typ option * string * Dec list * Stm
-                                         (* Function and procedure declaration *) 
+         | FunDec of Typ option * string * Dec list * Stm (* Function and procedure declaration *) 
 
    and Typ  = 
          | ITyp                          (* Type int                    *)

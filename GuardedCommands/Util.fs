@@ -34,7 +34,7 @@ module ParserUtil =
            Main Lexer.tokenize lexbuf
       with e ->
            let pos = lexbuf.EndPos
-           printfn "Error near line %d, character %d\n" pos.Line pos.Column
+           printfn "Error near line %d, character %d\ntext: %s" pos.Line pos.Column text
            failwith "parser termination"
 
 

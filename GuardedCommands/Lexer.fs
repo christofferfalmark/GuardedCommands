@@ -1,4 +1,4 @@
-# 1 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 1 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
  
 module Lexer
 open System
@@ -20,10 +20,12 @@ let keyword s =
     | "do"        -> DO
     | "od"        -> OD     
     | "true"      -> BOOL(true) 
-    | "false"     -> BOOL(false)     
+    | "false"     -> BOOL(false)  
+    | "return"    -> RETURN   
+    | "function"  -> FUNCTION
     | _           -> NAME s  
 
-# 26 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 28 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
 let trans : uint16[] array = 
     [| 
    (* State 0 *)
@@ -100,140 +102,140 @@ and tokenize  (lexbuf : Microsoft.FSharp.Text.Lexing.LexBuffer<_>) = _fslex_toke
 and _fslex_tokenize  _fslex_state lexbuf =
   match _fslex_tables.Interpret(_fslex_state,lexbuf) with
   | 0 -> ( 
-# 39 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 41 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  tokenize lexbuf 
-# 105 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 107 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 1 -> ( 
-# 40 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 42 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf 
-# 110 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 112 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 2 -> ( 
-# 41 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 43 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  INT<| Int32.Parse(Encoding.UTF8.GetString(lexbuf.Lexeme)) 
-# 115 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 117 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 3 -> ( 
-# 42 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 44 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  LP  
-# 120 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 122 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 4 -> ( 
-# 43 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 45 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  RP  
-# 125 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 127 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 5 -> ( 
-# 44 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 46 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  LSP 
-# 130 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 132 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 6 -> ( 
-# 45 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 47 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  RSP 
-# 135 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 137 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 7 -> ( 
-# 46 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 48 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  LCP 
-# 140 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 142 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 8 -> ( 
-# 47 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 49 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  RCP 
-# 145 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 147 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 9 -> ( 
-# 48 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 50 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  COMMA 
-# 150 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 152 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 10 -> ( 
-# 49 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 51 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  SEMI  
-# 155 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 157 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 11 -> ( 
-# 50 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 52 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  COLON 
-# 160 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 162 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 12 -> ( 
-# 51 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 53 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  BAR 
-# 165 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 167 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 13 -> ( 
-# 52 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 54 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  TO 
-# 170 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 172 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 14 -> ( 
-# 53 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 55 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  ASG   
-# 175 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 177 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 15 -> ( 
-# 54 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 56 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  NEG 
-# 180 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 182 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 16 -> ( 
-# 55 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 57 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  AND 
-# 185 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 187 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 17 -> ( 
-# 56 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 58 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  NEQ 
-# 190 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 192 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 18 -> ( 
-# 57 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 59 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  LT 
-# 195 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 197 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 19 -> ( 
-# 58 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 60 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  GT 
-# 200 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 202 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 20 -> ( 
-# 59 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 61 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  LE 
-# 205 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 207 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 21 -> ( 
-# 60 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 62 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  TIMES 
-# 210 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 212 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 22 -> ( 
-# 61 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 63 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  MINUS 
-# 215 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 217 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 23 -> ( 
-# 62 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 64 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  EQ 
-# 220 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 222 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 24 -> ( 
-# 63 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 65 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  PLUS 
-# 225 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 227 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 25 -> ( 
-# 64 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 66 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  keyword(Encoding.UTF8.GetString(lexbuf.Lexeme)) 
-# 230 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 232 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | 26 -> ( 
-# 65 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fsl"
+# 67 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fsl"
                                  EOF 
-# 235 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 237 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"
           )
   | _ -> failwith "tokenize"
 
-# 3000000 "D:\Document\GitHub\GuardedCommands\GuardedCommands\Lexer.fs"
+# 3000000 "C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\GuardedCommands\Lexer.fs"

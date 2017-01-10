@@ -14,6 +14,7 @@ open GuardedCommands.Frontend.AST
 %token PRINT ASG SKIP ABORT
 %token EOF
 %token HIGH
+%token FUNCTION
 %token RETURN
 
 %left AND
@@ -31,7 +32,6 @@ open GuardedCommands.Frontend.AST
 %type <Stm> Stm
 %type <Typ> BasicTyp Typ
 %type <Dec> Dec
-%type <Dec> Function
 %type <Dec list> DecL DecList
 %type <Program> Main Prog
 
@@ -52,19 +52,19 @@ Typ:
     BasicTyp                          { $1 }
 
 Dec: 
-    NAME COLON Typ                    { VarDec($3,$1) }
+   | NAME COLON Typ                   { VarDec($3,$1) }
+   | FUNCTION NAME LP DecL RP COLON Typ EQ LCP StmL RCP { FunDec(Some($7), $2, $4, Block([], $10)) }
 
 DecL: 
-                                      { [] }
+		                              { [] }
    | DecList                          { $1 }
-
-Function:
-
-   | NAME DecL Stm Typ             { FunDec(Some($4), $1, $2, $3) }
 
 DecList: 
    | Dec                              { [$1] }
    | Dec COMMA DecList                { $1 :: $3 }
+
+Function:
+	Dec								  { $1 }
 
 Access:
     NAME                              { AVar $1 }
@@ -78,6 +78,7 @@ Stm:
   | IF GuardedCommand FI              { Alt $2 }
   | DO GuardedCommand OD              { Do $2  }
   | RETURN Exp						  { Return(Some($2)) }
+  | NAME ASG NAME LP Exp RP     	  { Call($3, [$5]) }
 
 StmL:
                                       { [] } 
@@ -112,3 +113,10 @@ Exp:
   | Exp LT Exp                        { Apply("<", [$1; $3])}
   | Exp NEQ Exp                       { Apply("<>", [$1; $3])}
 
+ Exprs:
+									  { [] }
+	| Exprs1						  { $1 }
+
+ Exprs1:
+	  Exp							  { [$1] }
+	| Exp COMMA Exprs1				  { $1 :: $3}
