@@ -96,10 +96,6 @@ module CodeGeneration =
                                              CE vEnv fEnv exp @ [IFZERO labfalse] @ CSs vEnv fEnv stms @ [GOTO labend; Label labfalse] @ CSGCAlt vEnv fEnv gc
      | _ -> [STOP; Label labend]
 
-        (*
-                                CE vEnv fEnv b1 @ [IFZERO labfalse] @ CE vEnv fEnv b2
-                                @ [GOTO labend; Label labfalse; CSTI 0; Label labend]
-        *)
 (* ------------------------------------------------------------------- *)
 
 (* Build environments for global variables and functions *)

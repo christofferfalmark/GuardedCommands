@@ -78,7 +78,7 @@ Stm:
   | IF GuardedCommand FI              { Alt $2 }
   | DO GuardedCommand OD              { Do $2  }
   | RETURN Exp						  { Return(Some($2)) }
-  | NAME ASG NAME LP Exp RP     	  { Call($3, [$5]) }
+ 
 
 StmL:
                                       { [] } 
@@ -98,6 +98,7 @@ GCList:
 
 Exp:
     Access                            { Access $1 }
+  | NAME LP Exp RP     				  { Apply($1, [$3]) }
   | INT                               { N $1 }
   | BOOL                              { B $1 }       
   | LP Exp RP                         { $2 } 
