@@ -79,12 +79,10 @@ module CodeGeneration =
 
        | Alt (GC(gcs))   -> CSGCAlt vEnv fEnv gcs
 
-       | Do (GC(gcs))    -> [Label labbegin] @
-                            CSGCDo vEnv fEnv gcs
-       | _ -> failwith "hej"
+       | Do (GC(gcs))    -> [Label labbegin] @ CSGCDo vEnv fEnv gcs
+       | _ -> failwith "CS: not supported yet..."
 
    and CSs vEnv fEnv stms = List.collect (CS vEnv fEnv) stms 
-
 
    and CSGCDo vEnv fEnv = function 
      | (((exp:Exp), (stms:Stm list))::gc) -> let labfalse = newLabel()
@@ -109,13 +107,14 @@ module CodeGeneration =
              | VarDec (typ, var) -> let (vEnv1, code1) = allocate GloVar (typ, var) vEnv
                                     let (vEnv2, fEnv2, code2) = addv decr vEnv1 fEnv
                                     (vEnv2, fEnv2, code1 @ code2)
-             | FunDec (tyOpt, f, xs, body) -> failwith "makeGlobalEnvs: function/procedure declarations not supported yet"
+             | FunDec (tyOpt, f, xs, body) -> failwith "errorrrrrrrrrrrrrrr"
        addv decs (Map.empty, 0) Map.empty
 
 /// CP prog gives the code for a program prog
    let CP (P(decs,stms)) = 
        let _ = resetLabels ()
        let ((gvM,_) as gvEnv, fEnv, initCode) = makeGlobalEnvs decs
+       printfn "gvM: %A\ngvEnv: %A\nfEnv: %A\ninitCode: %A" gvM gvEnv fEnv initCode
        initCode @ CSs gvEnv fEnv stms @ [STOP]     
 
 

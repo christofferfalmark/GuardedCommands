@@ -17,9 +17,9 @@ module TypeCheck =
          | Apply(f,[e1;e2]) when List.exists (fun x ->  x=f) ["+";"*"; "="; "&&"; "-"] -> tcDyadic gtenv ltenv f e1 e2   
          | Apply(f, exprs)                                                             -> match  (Map.tryFind f gtenv) with 
                                                                                           | Some(FTyp(a,b))  -> if List.forall2(fun exp a' -> tcE gtenv ltenv exp = a') exprs a 
-                                                                                                                           then b.Value 
-                                                                                                                           else failwith "illtyped function application"
-                                                                                          | Some(_) | None              -> failwith "illtyped function application"
+                                                                                                                then b.Value 
+                                                                                                                else failwith "illtyped function application"
+                                                                                          | Some(_) | None   -> failwith "illtyped function application"
          | _                                                                           -> failwith "tcE: not supported yet"
 
    and tcMonadic gtenv ltenv f e = match (f, tcE gtenv ltenv e) with
@@ -63,23 +63,25 @@ module TypeCheck =
                                                            then () 
                                                            else failwith "illtyped return statement"
                          | _                            -> failwith "tcS: this statement is not supported yet"
-(*
-   and addFTyp f topt decs gtenv = let l = List.fold(fun (x) (VarDec(a,_)) -> a::x) [] decs
-                                   Map.add f (FTyp(l, topt)) gtenv
-  *)
+
    and addFTyp f topt = function
-    | VarDec(a,b)::decs -> a::(addFTyp f topt decs)
+    | VarDec(a,b)::decs -> (a,b)::(addFTyp f topt decs)
     | FunDec(_,_,_,_)::decs -> failwith "illtyped function declaration"
     | []          -> []
     
+    and updEnv gtenv = function
+        | VarDec(t,s)::decs -> updEnv (Map.add s t gtenv) decs
+        | [] -> gtenv
+        | FunDec(_,_,_,_)::decs -> failwith "cannot have a function declaration inside a function declaration"
 
    and tcGDec gtenv = function  
                       | VarDec(t,s)                      -> Map.add s t gtenv
-                      | FunDec(topt, f, decs, stm)       -> if tcGDecRet gtenv (stm, topt) && List.length (Set.toList (set(tcGDecDiff decs))) = decs.Length && tcS gtenv Map.empty topt stm = ()
-                                                            then 
-                                                                let l = addFTyp f topt decs
-                                                                Map.add f (FTyp(l, topt)) gtenv
-                                                                else failwith "illtyped function declaration"
+                      | FunDec(topt, f, decs, stm)       -> let gtenv = updEnv gtenv decs
+                                                            let l' = List.map(fun x -> fst x) (addFTyp f topt decs)
+                                                            let gtenv = Map.add f (FTyp(l', topt)) gtenv
+                                                            if tcGDecRet gtenv (stm, topt) && List.length (Set.toList (set(tcGDecDiff decs))) = decs.Length && tcS gtenv Map.empty topt stm = ()
+                                                            then gtenv 
+                                                            else failwith "illtyped function declaration"
 
    and tcGDecs gtenv = function
                        | dec::decs -> tcGDecs (tcGDec gtenv dec) decs
@@ -96,7 +98,7 @@ module TypeCheck =
     | _ -> []
    
    and tcGDecRet gtenv = function
-    | (Return(Some(exp)), typ) ->  Some(tcE gtenv Map.empty exp) = typ
+    | (Return(Some(exp)), typ) -> Some(tcE gtenv Map.empty exp) = typ
     | (Block(_, stms), typ)    -> List.forall(fun stm -> tcGDecRet gtenv (stm, typ)) stms
     | _ -> true
 

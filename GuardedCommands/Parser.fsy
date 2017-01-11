@@ -63,9 +63,6 @@ DecList:
    | Dec                              { [$1] }
    | Dec COMMA DecList                { $1 :: $3 }
 
-Function:
-	Dec								  { $1 }
-
 Access:
     NAME                              { AVar $1 }
       
@@ -98,7 +95,7 @@ GCList:
 
 Exp:
     Access                            { Access $1 }
-  | NAME LP Exp RP     				  { Apply($1, [$3]) }
+  | NAME LP Exprs RP   				  { Apply($1, $3) }
   | INT                               { N $1 }
   | BOOL                              { B $1 }       
   | LP Exp RP                         { $2 } 

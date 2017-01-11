@@ -42,7 +42,7 @@
  tcP prog checks the well-typeness of a program prog
 </summary>
 </member>
-<member name="M:GuardedCommands.Frontend.TypeCheck.tcS(Microsoft.FSharp.Collections.FSharpMap{System.String,GuardedCommands.Frontend.AST.Typ},Microsoft.FSharp.Collections.FSharpMap{System.String,GuardedCommands.Frontend.AST.Typ},GuardedCommands.Frontend.AST.Stm)">
+<member name="M:GuardedCommands.Frontend.TypeCheck.tcS(Microsoft.FSharp.Collections.FSharpMap{System.String,GuardedCommands.Frontend.AST.Typ},Microsoft.FSharp.Collections.FSharpMap{System.String,GuardedCommands.Frontend.AST.Typ},Microsoft.FSharp.Core.FSharpOption{GuardedCommands.Frontend.AST.Typ},GuardedCommands.Frontend.AST.Stm)">
 <summary>
  tcS gtenv ltenv retOpt s checks the well-typeness of a statement s on the basis of type environments gtenv and ltenv
  for global and local variables and the possible type of return expressions 

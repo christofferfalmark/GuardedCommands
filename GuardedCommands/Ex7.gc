@@ -1,6 +1,6 @@
 ﻿begin 
    x: int,
-   function f(x: int): int = { print x; return x+1 }; 
-   x:=f(2);
+   function f(y: int,z: int): int = { print y; print z; return y+1 }; 
+   x:=f(2,3);
    print x
 end
