@@ -44,20 +44,26 @@ module CodeGeneration =
                                           | "-"  -> [SUB] 
                                           | _    -> failwith "CE: this case is not possible"
                                 CE vEnv fEnv e1 @ CE vEnv fEnv e2 @ ins
-       | Apply(o, e) -> let labelf = newLabel()
-                        let labelend = newLabel()
-                        failwith "lort"
+       | Apply(f, es) -> callfun f es vEnv fEnv
        | _ -> failwith "CE: not supported yet"
        
+   (* Generate code to evaluate a list es of expressions: *)
+   and CEs vEnv fEnv es : instr list = List.concat(List.map (fun e -> CE vEnv fEnv e) es)
 
 /// CA vEnv fEnv acc gives the code for an access acc on the basis of a variable and a function environment
    and CA vEnv fEnv = function | AVar x         -> match Map.find x (fst vEnv) with
                                                    | (GloVar addr,_) -> [CSTI addr]
-                                                   | (LocVar addr,_) -> failwith "CA: Local variables not supported yet"
+                                                   | (LocVar addr,_) -> [GETBP; CSTI addr; ADD]
                                | AIndex(acc, e) -> failwith "CA: array indexing not supported yet" 
                                | ADeref e       -> failwith "CA: pointer dereferencing not supported yet"
 
-  
+   and callfun f es vEnv fEnv : instr list =
+     let (labf, tyOpt, paramdecs) = Map.find f fEnv
+     let argc = List.length es
+     if argc = List.length paramdecs 
+     then CEs vEnv fEnv es @ [CALL(argc, labf)]
+     else failwith "parameter/argument mismatch"
+
 (* Bind declared variable in env and generate code to allocate it: *)   
    let allocate (kind : int -> Var) (typ, x) (vEnv : varEnv)  =
     let (env, fdepth) = vEnv 
@@ -83,6 +89,8 @@ module CodeGeneration =
        | Alt (GC(gcs))   -> CSGCAlt vEnv fEnv gcs
 
        | Do (GC(gcs))    -> [Label labbegin] @ CSGCDo vEnv fEnv gcs
+       | Return None     -> [RET (snd vEnv - 1)]
+       | Return (Some e) ->  CE vEnv fEnv e @ [RET (snd vEnv)]
        | _ -> failwith "CS: not supported yet..."
 
    and CSs vEnv fEnv stms = List.collect (CS vEnv fEnv) stms 
@@ -110,15 +118,36 @@ module CodeGeneration =
              | VarDec (typ, var) -> let (vEnv1, code1) = allocate GloVar (typ, var) vEnv
                                     let (vEnv2, fEnv2, code2) = addv decr vEnv1 fEnv
                                     (vEnv2, fEnv2, code1 @ code2)
-             | FunDec (tyOpt, f, xs, body) -> addv decr vEnv (Map.add f (newLabel(), tyOpt, xs) fEnv)
+             | FunDec (tyOpt, f, xs, body) ->  let (vEnv1, _ ,code1) = addv xs vEnv fEnv
+                                               let (_, fvEnv2 ,code2) = addv decr vEnv1 (Map.add f (newLabel(), tyOpt, xs) fEnv)
+                                               (vEnv1, fvEnv2, code1 @ code2)
        addv decs (Map.empty, 0) Map.empty
+
+    (* Bind declared parameters in env: *)
+
+   let bindParam (env, fdepth) dec  : varEnv = 
+    match dec with
+    | VarDec(typ,x) -> (Map.add x (LocVar fdepth, typ) env, fdepth+1)
+    | FunDec(_,_,_,_) -> (Map.empty, 0)
+    
+   let bindParams (paras:Dec list) ((env, fdepth) : varEnv) : varEnv = List.fold bindParam (env, fdepth) paras
 
 /// CP prog gives the code for a program prog
    let CP (P(decs,stms)) = 
        let _ = resetLabels ()
        let ((gvM,_) as gvEnv, fEnv, initCode) = makeGlobalEnvs decs
-       printfn "gvM: %A\ngvEnv: %A\nfEnv: %A\ninitCode: %A" gvM gvEnv fEnv initCode
-       initCode @ CSs gvEnv fEnv stms @ [STOP]     
+
+       let compilefun (tyOpt, f, xs, body) =
+           printfn "f: %s, fEnv: %A, gvEnv: %A" f fEnv gvEnv
+           let (labf, _, paras) = Map.find f fEnv
+           let (envf, fdepthf) = bindParams paras (gvM, 0)
+           let code = CS gvEnv fEnv body
+           [Label labf] @ code @ [RET (List.length paras-1)]
+       let functions = 
+              List.choose (function 
+                               | FunDec (rTy, name, argTy, body) -> Some (compilefun (rTy, name, argTy, body))
+                               | VarDec _                        -> None) decs       
+       initCode @ CSs gvEnv fEnv stms @ [STOP] @ List.concat functions
 
 
 

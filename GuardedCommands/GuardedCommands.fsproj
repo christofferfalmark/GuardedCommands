@@ -50,8 +50,8 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <PropertyGroup>
-    <PreBuildEvent>"C:\Users\trill\Documents\GitHub\GuardedCommands\packages\FsLexYacc.7.0.3\build\fslex" "$(ProjectDir)Lexer.fsl"
-"C:\Users\trill\Documents\GitHub\GuardedCommands\packages\FsLexYacc.7.0.3\build\fsyacc" --module Parser "$(ProjectDir)Parser.fsy"</PreBuildEvent>
+    <PreBuildEvent>"C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\packages\FsLexYacc.7.0.3\build\fslex" "$(ProjectDir)Lexer.fsl"
+"C:\Users\Christoffer\Dropbox\DTU Master\3. Semester E16\02257 Applied functional programming\Project 2\Compiler\GuardedCommands\packages\FsLexYacc.7.0.3\build\fsyacc" --module Parser "$(ProjectDir)Parser.fsy"</PreBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AST.fs" />
