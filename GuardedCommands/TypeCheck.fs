@@ -99,7 +99,8 @@ module TypeCheck =
    
    and tcGDecRet gtenv = function
     | (Return(Some(exp)), typ) -> Some(tcE gtenv Map.empty exp) = typ
-    | (Block(_, stms), typ)    -> List.forall(fun stm -> tcGDecRet gtenv (stm, typ)) stms
+    | (Block([], stms), typ)   -> List.forall(fun stm -> tcGDecRet gtenv (stm, typ)) stms
+    | (Block(dec, stms), typ)  -> failwith "tcGDecRet local declarations not supported..."
     | _ -> true
 
 /// tcP prog checks the well-typeness of a program prog
