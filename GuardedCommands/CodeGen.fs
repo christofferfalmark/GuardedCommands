@@ -43,8 +43,11 @@ module CodeGeneration =
                                           | "="  -> [EQ] 
                                           | "-"  -> [SUB] 
                                           | _    -> failwith "CE: this case is not possible"
-                                CE vEnv fEnv e1 @ CE vEnv fEnv e2 @ ins 
-       | _            -> failwith "CE: not supported yet"
+                                CE vEnv fEnv e1 @ CE vEnv fEnv e2 @ ins
+       | Apply(o, e) -> let labelf = newLabel()
+                        let labelend = newLabel()
+                        failwith "lort"
+       | _ -> failwith "CE: not supported yet"
        
 
 /// CA vEnv fEnv acc gives the code for an access acc on the basis of a variable and a function environment
@@ -107,7 +110,7 @@ module CodeGeneration =
              | VarDec (typ, var) -> let (vEnv1, code1) = allocate GloVar (typ, var) vEnv
                                     let (vEnv2, fEnv2, code2) = addv decr vEnv1 fEnv
                                     (vEnv2, fEnv2, code1 @ code2)
-             | FunDec (tyOpt, f, xs, body) -> failwith "errorrrrrrrrrrrrrrr"
+             | FunDec (tyOpt, f, xs, body) -> addv decr vEnv (Map.add f (newLabel(), tyOpt, xs) fEnv)
        addv decs (Map.empty, 0) Map.empty
 
 /// CP prog gives the code for a program prog
