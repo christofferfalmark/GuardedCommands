@@ -74,30 +74,20 @@ open VirtualMachine
 //List.item 2 pts;
 
 // Test of programs covered by the first task (Section 3.7):
-// List.iter exec ["Ex1.gc"; "Ex2.gc";"Ex3.gc"; "Ex4.gc"; "Ex5.gc"; "Ex6.gc"; "Skip.gc"];;
-// exec "ExKage.gc"
-// Test GC:
-///let _ = tcP (parseFromFile "Ex3.gc")
-
-(*
-parseFromFile "Ex5.gc"
-
-CP (parseFromFile "Ex5.gc")
-exec "Ex5.gc"
-*)
+List.iter exec ["Ex1.gc"; "Ex2.gc";"Ex3.gc"; "Ex4.gc"; "Ex5.gc"; "Ex6.gc"; "Skip.gc"];;
+// Test program that fails because of an illformed guarded command
+exec "ExGC_fail.gc"
 
 // Test of programs covered by the second task (Section 4.3):
-// parseFromFile "factCBV.gc"
-// parseFromFile "Ex7.gc"
-CP (parseFromFile "Ex7.gc")
-// List.iter exec ["Ex7.gc"; "fact.gc"; "factRec.gc"; "factCBV.gc"];;
-// exec "Ex7.gc"
+List.iter exec ["Ex7.gc"; "fact.gc"; "factRec.gc"; "factCBV.gc"];;
+
 // Test of programs where the type-checker detects error(s) 
 // exec "Ex7_Error.gc"
-(*
-// Test of programs covered by the fourth task (Section 5.4):
-List.iter exec ["A0.gc"; "A1.gc"; "A2.gc"; "A3.gc"];;
 
+// Test of programs covered by the fourth task (Section 5.4):
+// List.iter exec ["A0.gc"; "A1.gc"; "A2.gc"; "A3.gc"];;
+
+(*
 // Test of programs covered by the fifth task (Section 6.1):
 List.iter exec ["A4.gc"; "Swap.gc"; "QuickSortV1.gc"];;
 

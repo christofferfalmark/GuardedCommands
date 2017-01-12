@@ -23,6 +23,15 @@ module CodeGeneration =
    type ParamDecs = (Typ * string) list
    type funEnv = Map<string, label * Typ option * ParamDecs>
 
+     (* Bind declared parameters in env: *)
+
+   let bindParam (env, fdepth) dec  : varEnv = 
+    match dec with
+     | VarDec(typ,x) -> (Map.add x (LocVar fdepth, typ) env, fdepth+1)
+     | _ -> (env,fdepth)
+    
+   let bindParams (paras:Dec list) ((env, fdepth) : varEnv) : varEnv = List.fold bindParam (env, fdepth) paras
+
 /// CE vEnv fEnv e gives the code for an expression e on the basis of a variable and a function environment
    let rec CE vEnv fEnv = 
        function
@@ -51,11 +60,12 @@ module CodeGeneration =
    and CEs vEnv fEnv es : instr list = List.concat(List.map (fun e -> CE vEnv fEnv e) es)
 
 /// CA vEnv fEnv acc gives the code for an access acc on the basis of a variable and a function environment
-   and CA vEnv fEnv = function | AVar x         -> match Map.find x (fst vEnv) with
-                                                   | (GloVar addr,_) -> [CSTI addr]
-                                                   | (LocVar addr,_) -> [GETBP; CSTI addr; ADD]
-                               | AIndex(acc, e) -> failwith "CA: array indexing not supported yet" 
-                               | ADeref e       -> failwith "CA: pointer dereferencing not supported yet"
+   and CA vEnv fEnv = function 
+   | AVar x         -> match Map.find x (fst vEnv) with
+                             | (GloVar addr,_) -> [CSTI addr]
+                             | (LocVar addr,_) -> [GETBP; CSTI addr; ADD]
+   | AIndex(acc, e) -> failwith "CA: array indexing not supported yet" 
+   | ADeref e       -> failwith "CA: pointer dereferencing not supported yet"
 
    and callfun f es vEnv fEnv : instr list =
      let (labf, tyOpt, paramdecs) = Map.find f fEnv
@@ -68,8 +78,7 @@ module CodeGeneration =
    let allocate (kind : int -> Var) (typ, x) (vEnv : varEnv)  =
     let (env, fdepth) = vEnv 
     match typ with
-    | ATyp (ATyp _, _) -> 
-      raise (Failure "allocate: array of arrays not permitted")
+    | ATyp (ATyp _, _) -> raise (Failure "allocate: array of arrays not permitted")
     | ATyp (t, Some i) -> failwith "allocate: array not supported yet"
     | _ -> 
       let newEnv = (Map.add x (kind fdepth, typ) env, fdepth+1)
@@ -84,17 +93,43 @@ module CodeGeneration =
 
        | Ass(acc,e)       -> CA vEnv fEnv acc @ CE vEnv fEnv e @ [STI; INCSP -1]
 
-       | Block([],stms)  -> CSs vEnv fEnv stms
-
+       | Block([],stms)    -> CSs vEnv fEnv stms
+       | Block(decs, stms) -> (*
+                              let (vEnv, fdepth) = bindParams decs vEnv
+                              CSs (vEnv,fdepth) fEnv stms 
+                              *)
+                              let rec loop vEnv = function
+                                | []     -> (vEnv, [])
+                                | VarDec(typ, x)::dr -> 
+                                    let (varEnv1, code1) = allocate LocVar (typ, x) vEnv 
+                                    let (fdepthr, coder) = loop varEnv1 dr
+                                    (fdepthr, code1 @ coder)
+                              let rec loop1 vEnv fEnv = function
+                                | []     -> (vEnv, [])
+                                | s1::sr -> 
+                                    let (varEnv1, code1) = (vEnv, CS vEnv fEnv s1) 
+                                    let (fdepthr, coder) = loop1 varEnv1 fEnv sr
+                                    (fdepthr, code1 @ coder)
+                              let (vEnv, code1) = loop vEnv decs
+                              let (vEnv, code2) = loop1 vEnv fEnv stms
+                              code1 @ code2 @ [INCSP -(snd vEnv)]
+                              
        | Alt (GC(gcs))   -> CSGCAlt vEnv fEnv gcs
 
        | Do (GC(gcs))    -> [Label labbegin] @ CSGCDo vEnv fEnv gcs
-       | Return None     -> [RET (snd vEnv - 1)]
-       | Return (Some e) ->  CE vEnv fEnv e @ [RET (snd vEnv)]
+       | Return (Some e) -> CE vEnv fEnv e @ [RET (snd vEnv)]
+       | Return None     -> failwith "CS: return procedures"
        | _ -> failwith "CS: not supported yet..."
 
    and CSs vEnv fEnv stms = List.collect (CS vEnv fEnv) stms 
-
+  
+   (*
+   and cStmtOrDec block vEnv fEnv =  
+    match block with
+    | Block(decs, stms) -> let ((vEnv, fdepth),code) = allocate LocVar (typ, x) vEnv 
+                           let (c,d) = (vEnv, CS stmt vEnv fEnv)
+                           ()
+*)
    and CSGCDo vEnv fEnv = function 
      | (((exp:Exp), (stms:Stm list))::gc) -> let labfalse = newLabel()
                                              CE vEnv fEnv exp @ [IFZERO labfalse] @ CSs vEnv fEnv stms @ [GOTO labbegin; Label labfalse] @ CSGCDo vEnv fEnv gc
@@ -107,6 +142,7 @@ module CodeGeneration =
 
 (* ------------------------------------------------------------------- *)
 
+   
 (* Build environments for global variables and functions *)
 
    let makeGlobalEnvs decs = 
@@ -123,26 +159,17 @@ module CodeGeneration =
                                                (vEnv1, fvEnv2, code1 @ code2)
        addv decs (Map.empty, 0) Map.empty
 
-    (* Bind declared parameters in env: *)
-
-   let bindParam (env, fdepth) dec  : varEnv = 
-    match dec with
-    | VarDec(typ,x) -> (Map.add x (LocVar fdepth, typ) env, fdepth+1)
-    | FunDec(_,_,_,_) -> (Map.empty, 0)
-    
-   let bindParams (paras:Dec list) ((env, fdepth) : varEnv) : varEnv = List.fold bindParam (env, fdepth) paras
-
+  
 /// CP prog gives the code for a program prog
    let CP (P(decs,stms)) = 
        let _ = resetLabels ()
        let ((gvM,_) as gvEnv, fEnv, initCode) = makeGlobalEnvs decs
 
        let compilefun (tyOpt, f, xs, body) =
-           printfn "f: %s, fEnv: %A, gvEnv: %A" f fEnv gvEnv
            let (labf, _, paras) = Map.find f fEnv
            let (envf, fdepthf) = bindParams paras (gvM, 0)
-           let code = CS gvEnv fEnv body
-           [Label labf] @ code @ [RET (List.length paras-1)]
+           let code = CS (envf, fdepthf) fEnv body
+           [Label labf] @ code @ [RET (paras.Length-1)]
        let functions = 
               List.choose (function 
                                | FunDec (rTy, name, argTy, body) -> Some (compilefun (rTy, name, argTy, body))

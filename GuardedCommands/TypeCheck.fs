@@ -57,7 +57,8 @@ module TypeCheck =
                          | Ass(acc,e) ->                   if tcA gtenv ltenv acc = tcE gtenv ltenv e 
                                                            then ()
                                                            else failwith "illtyped assignment"                                
-                         | Block([],stms) ->               List.iter (tcS gtenv ltenv retOpt) stms
+                         | Block([], stms)              -> List.iter (tcS gtenv ltenv retOpt) stms
+                         | Block(decs,stms)             -> List.iter (tcS (updEnv gtenv decs) ltenv retOpt) stms
                          | Alt (GC(gcs)) | Do (GC(gcs)) -> tcGCSeq gtenv ltenv retOpt gcs
                          | Return(Some(e))              -> if Some(tcE gtenv ltenv e) = retOpt 
                                                            then () 
@@ -71,8 +72,8 @@ module TypeCheck =
     
     and updEnv gtenv = function
         | VarDec(t,s)::decs -> updEnv (Map.add s t gtenv) decs
-        | [] -> gtenv
         | FunDec(_,_,_,_)::decs -> failwith "cannot have a function declaration inside a function declaration"
+        | [] -> gtenv
 
    and tcGDec gtenv = function  
                       | VarDec(t,s)                      -> Map.add s t gtenv
@@ -99,8 +100,13 @@ module TypeCheck =
    
    and tcGDecRet gtenv = function
     | (Return(Some(exp)), typ) -> Some(tcE gtenv Map.empty exp) = typ
-    | (Block([], stms), typ)   -> List.forall(fun stm -> tcGDecRet gtenv (stm, typ)) stms
-    | (Block(dec, stms), typ)  -> failwith "tcGDecRet local declarations not supported..."
+    
+    | (Block(decs, stms), typ)  -> if decs.Length > 0 
+                                   then 
+                                        let l = updEnv gtenv decs
+                                        List.forall(fun stm -> tcGDecRet l (stm, typ)) stms
+                                   else 
+                                   List.forall(fun stm -> tcGDecRet gtenv (stm, typ)) stms
     | _ -> true
 
 /// tcP prog checks the well-typeness of a program prog
