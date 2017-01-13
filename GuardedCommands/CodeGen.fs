@@ -22,9 +22,9 @@ module CodeGeneration =
 
    type ParamDecs = (Typ * string) list
    type funEnv = Map<string, label * Typ option * ParamDecs>
-
+     
+     // The following functions (bindParam & bindParams) is based on the provided Micro-C project (P. Sestoft).
      (* Bind declared parameters in env: *)
-
    let bindParam (env, fdepth) dec  : varEnv = 
     match dec with
      | VarDec(typ,x) -> (Map.add x (LocVar fdepth, typ) env, fdepth+1)
@@ -67,6 +67,7 @@ module CodeGeneration =
    | AIndex(acc, e) -> failwith "CA: array indexing not supported yet" 
    | ADeref e       -> failwith "CA: pointer dereferencing not supported yet"
 
+  // The following code is based on the provided Micro-C project (P. Sestoft).
    and callfun f es vEnv fEnv : instr list =
      let (labf, tyOpt, paramdecs) = Map.find f fEnv
      let argc = List.length es
@@ -94,24 +95,22 @@ module CodeGeneration =
        | Ass(acc,e)       -> CA vEnv fEnv acc @ CE vEnv fEnv e @ [STI; INCSP -1]
 
        | Block([],stms)    -> CSs vEnv fEnv stms
-       | Block(decs, stms) -> (*
-                              let (vEnv, fdepth) = bindParams decs vEnv
-                              CSs (vEnv,fdepth) fEnv stms 
-                              *)
+       | Block(decs, stms) -> 
+                              // The following code is based on the provided Micro-C project (P. Sestoft).
                               let rec loop vEnv = function
-                                | []     -> (vEnv, [])
                                 | VarDec(typ, x)::dr -> 
                                     let (varEnv1, code1) = allocate LocVar (typ, x) vEnv 
                                     let (fdepthr, coder) = loop varEnv1 dr
                                     (fdepthr, code1 @ coder)
+                                | [] | _    -> (vEnv, [])
                               let rec loop1 vEnv fEnv = function
                                 | []     -> (vEnv, [])
                                 | s1::sr -> 
                                     let (varEnv1, code1) = (vEnv, CS vEnv fEnv s1) 
                                     let (fdepthr, coder) = loop1 varEnv1 fEnv sr
                                     (fdepthr, code1 @ coder)
-                              let (vEnv, code1) = loop vEnv decs
-                              let (vEnv, code2) = loop1 vEnv fEnv stms
+                              let (vEnv1, code1) = loop vEnv decs
+                              let (vEnv2, code2) = loop1 vEnv1 fEnv stms
                               code1 @ code2 @ [INCSP -(snd vEnv)]
                               
        | Alt (GC(gcs))   -> CSGCAlt vEnv fEnv gcs
@@ -165,6 +164,7 @@ module CodeGeneration =
        let _ = resetLabels ()
        let ((gvM,_) as gvEnv, fEnv, initCode) = makeGlobalEnvs decs
 
+       // The following code is based on the provided Micro-C project (P. Sestoft).
        let compilefun (tyOpt, f, xs, body) =
            let (labf, _, paras) = Map.find f fEnv
            let (envf, fdepthf) = bindParams paras (gvM, 0)

@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="AST.fs" />
     <None Include="Ex7_Error.gc" />
-    <None Include="ExKage.gc" />
+    <None Include="ExGC_fail.gc" />
     <None Include="Parser.fsy" />
     <None Include="Lexer.fsl" />
     <Compile Include="Parser.fs" />

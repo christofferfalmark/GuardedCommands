@@ -97,7 +97,7 @@ module TypeCheck =
    and tcGDecDiff = function
     | (VarDec(a, b))::decs -> b::tcGDecDiff decs
     | _ -> []
-   
+    
    and tcGDecRet gtenv = function
     | (Return(Some(exp)), typ) -> Some(tcE gtenv Map.empty exp) = typ
     
@@ -112,5 +112,3 @@ module TypeCheck =
 /// tcP prog checks the well-typeness of a program prog
    and tcP(P(decs, stms)) = let gtenv = tcGDecs Map.empty decs
                             List.iter (tcS gtenv Map.empty None) stms
-
-  
